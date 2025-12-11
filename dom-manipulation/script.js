@@ -33,9 +33,10 @@ function showRandomQuote() {
     const quote = quotes[randomIndex];
 
     const quoteDiv = document.getElementById('quoteDisplay');
+    quoteDiv.innerHTML = "";
 
     const quoteParagraph = document.createElement('blockquote');
-    quoteParagraph.innerHTML = `"${quote.text}"`;
+    quoteParagraph.textContent = `"${quote.text}"`;
     const quoteCategory = document.createElement('span');
     quoteCategory.textContent = `Category: ${quote.category}`;
 
