@@ -9,9 +9,9 @@ const button = document.getElementById('newQuote');
 button.addEventListener('click', showRandomQuote);
 
 const formButton = document.getElementById('submit');
-formButton.addEventListener('click', addQuote);
+formButton.addEventListener('click', createAddQuoteForm);
 
-function addQuote(event) {
+function createAddQuoteForm(event) {
   event.preventDefault();
   const quoteInput = document.getElementById("newQuoteText");
   const quoteCategoryInput = document.getElementById("newQuoteCategory");
