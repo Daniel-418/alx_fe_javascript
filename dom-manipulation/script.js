@@ -33,13 +33,15 @@ function showRandomQuote() {
     const quote = quotes[randomIndex];
 
     const quoteDiv = document.getElementById('quoteDisplay');
-    quoteDiv.innerHTML = `
-      <p><blockquote>"${quote.text}"</blockquote></p>
-      Category: <span>${quote.category}</span>
-    `
+
+    const quoteParagraph = document.createElement('p');
+    quoteParagraph.textContent = `"${quote.text}"`;
+    const quoteCategory = document.createElement('span');
+    quoteCategory.textContent = `Category: ${quote.category}`;
+
+    quoteDiv.appendChild(quoteParagraph);
+    quoteDiv.appendChild(quoteCategory);
+
   }
 }
 
-function CreateAddQuoteForm() {
-
-}
