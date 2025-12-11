@@ -1,9 +1,13 @@
-const quotes = [
-  {
-    category: "personal",
-    text: "Every man is a giant"
-  }
-]
+
+let quotes = JSON.parse(localStorage.getItem('quotes'));
+if (!quotes) {
+  quotes = [
+    {
+      category: "personal",
+      text: "This is a block-level quote"
+    }
+  ]
+}
 
 const button = document.getElementById('newQuote');
 button.addEventListener('click', showRandomQuote);
@@ -23,6 +27,7 @@ function createAddQuoteForm(event) {
       category: `${quoteCategory}`,
       text: `${quote}`
     });
+    localStorage.setItem('quotes', JSON.stringify(quotes))
     console.log("successful");
   }
 }
