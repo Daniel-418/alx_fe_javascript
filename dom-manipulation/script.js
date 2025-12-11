@@ -15,7 +15,6 @@ function addQuote(event) {
   event.preventDefault();
   const quoteInput = document.getElementById("newQuoteText");
   const quoteCategoryInput = document.getElementById("newQuoteCategory");
-  console.log('event listener runs');
 
   if (quoteInput && quoteCategoryInput) {
     const quote = quoteInput.value;
