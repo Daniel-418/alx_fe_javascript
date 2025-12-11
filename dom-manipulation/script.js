@@ -34,7 +34,7 @@ function showRandomQuote() {
 
     const quoteDiv = document.getElementById('quoteDisplay');
 
-    const quoteParagraph = document.createElement('p');
+    const quoteParagraph = document.createElement('blockquote');
     quoteParagraph.textContent = `"${quote.text}"`;
     const quoteCategory = document.createElement('span');
     quoteCategory.textContent = `Category: ${quote.category}`;
