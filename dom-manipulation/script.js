@@ -15,14 +15,51 @@ button.addEventListener('click', showRandomQuote);
 const formButton = document.getElementById('submit');
 formButton.addEventListener('click', createAddQuoteForm);
 
+const exportButton = document.getElementById('exportQuotes');
+exportButton.addEventListener('click', exportJson);
+
+const file = document.getElementById('importFile');
+file.addEventListener('change', importFromJsonFile);
+
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function(event) {
+    const importedQuotes = JSON.parse(event.target.result);
+    quotes.push(...importedQuotes);
+    saveQuotes();
+    alert('Quotes imported Successfully');
+
+  };
+  fileReader.readAsText(event.target.files[0]);
+}
+
+function saveQuotes() {
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+function exportJson() {
+  const blob = new Blob([JSON.stringify(quotes)], { type: "application/json" });
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = "my_quotes.json";
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+}
+
 function createAddQuoteForm(event) {
   event.preventDefault();
   const quoteInput = document.getElementById("newQuoteText");
   const quoteCategoryInput = document.getElementById("newQuoteCategory");
+  const quote = quoteInput.value;
+  const quoteCategory = quoteCategoryInput.value;
 
-  if (quoteInput && quoteCategoryInput) {
-    const quote = quoteInput.value;
-    const quoteCategory = quoteCategoryInput.value;
+  if (quote != "" && quoteCategory != "") {
+
     quotes.push({
       category: `${quoteCategory}`,
       text: `${quote}`
