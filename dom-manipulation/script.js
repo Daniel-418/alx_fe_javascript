@@ -194,7 +194,7 @@ async function syncQuotes() {
       filterQuotes();
       showNotification(`Synced: ${newQuotesCount} new, ${conflictResolved} conflicts resolved.`);
     } else {
-      showNotification("Sync complete. No new updates.");
+      showNotification("Quotes synced with server!");
     }
 
   } catch (error) {
