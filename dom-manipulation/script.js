@@ -27,6 +27,9 @@ file.addEventListener('change', importFromJsonFile);
 const selectCategory = document.getElementById('categoryFilter');
 selectCategory.addEventListener('change', filterQuotes)
 
+const syncButton = document.getElementById('syncQuotes');
+syncButton.addEventListener('click', syncQuotes)
+
 populateCategories();
 
 const selectedCategory = localStorage.getItem('lastSelectedCategory');
@@ -128,45 +131,14 @@ function showRandomQuote() {
 }
 
 async function fetchQuotesFromServer() {
-  try {
-    const url = "https://jsonplaceholder.typicode.com/posts";
-    const response = await fetch(url);
-    const data = await response.json();
-    const serverQuotes = data.slice(0, 5);
+  const url = "https://jsonplaceholder.typicode.com/posts";
+  const response = await fetch(url);
+  const data = await response.json();
 
-    let newQuotesCount = 0;
-    let conflictResolved = 0;
-
-    for (const item of serverQuotes) {
-      const remoteQuote = {
-        category: item.title,
-        text: item.body
-      }
-
-      const existingQuote = quotes.find(q => q.text === remoteQuote.text);
-      if (!existingQuote) {
-        quotes.push(remoteQuote);
-        newQuotesCount++;
-      }
-      else {
-        if (existingQuote.category !== remoteQuote.category) {
-          existingQuote.category = remoteQuote.category;
-        }
-        conflictResolved++;
-      }
-    }
-
-    if (newQuotesCount > 0 || conflictResolved > 0) {
-      saveQuotes();
-      populateCategories();
-      filterQuotes();
-
-      showNotification(`Quotes synced from server, ${newQuotesCount} new, ${conflictResolved} conflicts`);
-    }
-  }
-  catch (error) {
-    console.log(`error fetching posts: ${error}`);
-  }
+  return data.slice(0, 5).map(item => ({
+    category: item.title,
+    text: item.body
+  }));
 }
 
 function showNotification(message) {
@@ -191,6 +163,49 @@ async function postQuotesToServer() {
   console.log(data);
 }
 
-setInterval(fetchQuotesFromServer, 10000);
+async function syncQuotes() {
+  try {
+    syncButton.innerText = "Syncing...";
+    syncButton.disabled = true;
+
+    const serverQuotes = await fetchQuotesFromServer();
+
+    let newQuotesCount = 0;
+    let conflictResolved = 0;
+
+    for (const remoteQuote of serverQuotes) {
+      const existingQuote = quotes.find(q => q.text === remoteQuote.text);
+
+      if (!existingQuote) {
+        // New Quote? Add it.
+        quotes.push(remoteQuote);
+        newQuotesCount++;
+      } else {
+        if (existingQuote.category !== remoteQuote.category) {
+          existingQuote.category = remoteQuote.category;
+          conflictResolved++;
+        }
+      }
+    }
+
+    if (newQuotesCount > 0 || conflictResolved > 0) {
+      saveQuotes();
+      populateCategories();
+      filterQuotes();
+      showNotification(`Synced: ${newQuotesCount} new, ${conflictResolved} conflicts resolved.`);
+    } else {
+      showNotification("Sync complete. No new updates.");
+    }
+
+  } catch (error) {
+    console.error("Sync failed:", error);
+    showNotification("Error syncing with server.");
+  } finally {
+    syncButton.innerText = "Sync Quotes";
+    syncButton.disabled = false;
+  }
+}
+
+setInterval(syncQuotes, 10000);
 
 
