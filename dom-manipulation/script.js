@@ -10,6 +10,7 @@ if (!quotes) {
 }
 
 let displayedQuotes = [...quotes];
+let serverQuotes = [];
 
 const button = document.getElementById('newQuote');
 button.addEventListener('click', showRandomQuote);
@@ -63,6 +64,8 @@ function importFromJsonFile(event) {
     quotes.push(...importedQuotes);
     saveQuotes();
     alert('Quotes imported Successfully');
+
+    populateCategories();
 
   };
   fileReader.readAsText(event.target.files[0]);
@@ -123,4 +126,68 @@ function showRandomQuote() {
 
   }
 }
+
+async function fetchQuotesFromServer() {
+  try {
+    const url = "https://jsonplaceholder.typicode.com/posts";
+    const response = await fetch(url);
+    const data = await response.json();
+    const serverQuotes = data.slice(0, 5);
+
+    let newQuotesCount = 0;
+    let conflictResolved = 0;
+
+    for (const item of serverQuotes) {
+      const remoteQuote = {
+        category: item.title,
+        text: item.body
+      }
+
+      const existingQuote = quotes.find(q => q.text === remoteQuote.text);
+      if (!existingQuote) {
+        quotes.push(remoteQuote);
+        newQuotesCount++;
+      }
+      else {
+        if (existingQuote.category !== remoteQuote.category) {
+          existingQuote.category = remoteQuote.category;
+        }
+        conflictResolved++;
+      }
+    }
+
+    if (newQuotesCount > 0 || conflictResolved > 0) {
+      saveQuotes();
+      populateCategories();
+      filterQuotes();
+
+      showNotification(`Quotes synced from server, ${newQuotesCount} new, ${conflictResolved} conflicts`);
+    }
+  }
+  catch (error) {
+    console.log(`error fetching posts: ${error}`);
+  }
+}
+
+function showNotification(message) {
+  const notification = document.getElementById('syncNotification');
+  notification.innerText = message;
+  notification.style.display = 'block';
+  notification.style.backgroundColor = '#d4edda';
+  notification.style.color = '#155724';
+}
+
+async function postQuotesToServer() {
+  const url = "https://jsonplaceholder.typicode.com/posts";
+  const response = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(quotes)
+  })
+
+  const data = await response.json();
+  console.log(data);
+}
+
+setInterval(fetchQuotesFromServer, 10000);
+
 
