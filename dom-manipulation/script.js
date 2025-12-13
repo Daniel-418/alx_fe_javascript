@@ -9,6 +9,8 @@ if (!quotes) {
   ]
 }
 
+let displayedQuotes = [...quotes];
+
 const button = document.getElementById('newQuote');
 button.addEventListener('click', showRandomQuote);
 
@@ -21,6 +23,39 @@ exportButton.addEventListener('click', exportJson);
 const file = document.getElementById('importFile');
 file.addEventListener('change', importFromJsonFile);
 
+const selectCategory = document.getElementById('categoryFilter');
+selectCategory.addEventListener('change', filterQuotes)
+
+populateCategories();
+
+const lastSelectedCategory = localStorage.getItem('lastSelectedCategory');
+if (lastSelectedCategory) {
+  selectCategory.value = lastSelectedCategory;
+  filterQuotes();
+}
+
+function filterQuotes() {
+  const category = selectCategory.value;
+  localStorage.setItem('lastSelectedCategory', category);
+  if (category !== "all") {
+    displayedQuotes = quotes.filter((quote) => quote.category === category);
+  }
+  else {
+    displayedQuotes = [...quotes];
+  }
+}
+
+function populateCategories() {
+  const duplicateCategories = quotes.map((quote) => quote.category);
+  const categories = new Set(duplicateCategories);
+
+  for (const category of categories) {
+    option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    selectCategory.appendChild(option);
+  }
+}
 function importFromJsonFile(event) {
   const fileReader = new FileReader();
   fileReader.onload = function(event) {
@@ -64,15 +99,16 @@ function createAddQuoteForm(event) {
       category: `${quoteCategory}`,
       text: `${quote}`
     });
+    populateCategories();
     localStorage.setItem('quotes', JSON.stringify(quotes))
     console.log("successful");
   }
 }
 
 function showRandomQuote() {
-  if (quotes.length > 0) {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const quote = quotes[randomIndex];
+  if (displayedQuotes.length > 0) {
+    const randomIndex = Math.floor(Math.random() * displayedQuotes.length);
+    const quote = displayedQuotes[randomIndex];
 
     const quoteDiv = document.getElementById('quoteDisplay');
     quoteDiv.innerHTML = "";
