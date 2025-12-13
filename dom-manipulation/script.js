@@ -28,9 +28,9 @@ selectCategory.addEventListener('change', filterQuotes)
 
 populateCategories();
 
-const lastSelectedCategory = localStorage.getItem('lastSelectedCategory');
-if (lastSelectedCategory) {
-  selectCategory.value = lastSelectedCategory;
+const selectedCategory = localStorage.getItem('lastSelectedCategory');
+if (selectedCategory) {
+  selectCategory.value = selectedCategory;
   filterQuotes();
 }
 
